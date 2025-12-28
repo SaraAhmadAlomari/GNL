@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: saalomar <saalomar@learner.42.tech>        +#+  +:+       +#+        */
+/*   By: saalomar <sarah.alomari@learner.42.tech    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 10:48:01 by saalomar          #+#    #+#             */
-/*   Updated: 2025/12/22 15:07:43 by saalomar         ###   ########.fr       */
+/*   Updated: 2025/12/28 13:46:03 by saalomar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "get_next_line.h"
 
 static char	*copy_line_and_update_stash(char **stash, int len)
@@ -55,14 +56,18 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	while (!has_newline(stash))
+	bytes = 1;
+	while (!has_newline(stash) && bytes > 0)
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
-		if (bytes == 0 && stash && *stash)
-			break ;
-		if (bytes <= 0)
+		if (bytes < 0)
+		{
+			free(stash);
+			stash = NULL;
 			return (NULL);
+		}
 		buffer[bytes] = '\0';
+		if(bytes > 0)
 		stash = ft_strjoin(stash, buffer);
 	}
 	return (extract_line(&stash));
